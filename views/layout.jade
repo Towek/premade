@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    block vars
+    block head-top
+    meta(charset='utf-8')
+    meta(http-equiv='x-ua-compatible', content='ie=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title #{title} | Premade
+    link(rel='stylesheet', href='/css/vendor/foundation.css')
+    link(rel='stylesheet', href='/css/main.css')
+    block head-bottom
+  body
+    block body
+
+    script(src='/js/lib/jquery.js')
+    script(src='/js/lib/foundation.js')
+    script(src='/js/main.js')
