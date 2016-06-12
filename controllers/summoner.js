@@ -14,7 +14,11 @@ router.get('/summoner/:region/:id', function(req, res) {
       if(r.statusCode == 200) {
         b = JSON.parse(b);
         getMatchlist(id, region, function(e, matches) {
-          getMatch(matches[0].matchId, region, id, {
+          var matchIds = [];
+          for(var i = 0; i < 500; i++ ) {
+            matchIds.push(matches[i].matchId);
+          }
+          getMatch(matchIds, region, id, {
             ids: {},
             games: 0
           }, function(e, data) {
@@ -47,9 +51,9 @@ function getMatchlist(id, region, cb) {
   });
 }
 
-function getMatch(matchId, region, id, data, cb) {
+function getMatch(matchIds, region, id, data, cb) {
   request('https://' + region + '.api.pvp.net/api/lol/' + region + '/v2.2/match/'
-  + matchId + '?api_key=' + process.env.KEY, function(e, r, b) {
+  + matchIds[0] + '?api_key=' + process.env.KEY, function(e, r, b) {
     if (e) {
       log.error(e);
     } else {
@@ -84,10 +88,16 @@ function getMatch(matchId, region, id, data, cb) {
           }
         }
         data.games++;
-
-        cb(null, data);
+        
+        matchIds.shift();
+        if(matchIds.length) {
+          getMatch(matchIds, region, id, data, cb);
+        } else {
+          cb(null, data);
+        }
       } else {
         log.error(r.statusCode);
+        cb(r.statusCode, data);
       }
     }
   });
