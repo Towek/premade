@@ -2,4 +2,26 @@ extends layout
 block vars
   - var title = 'Home';
 block body
-  h1 Home
+  .row
+    .small-12.columns
+      form(method='post')
+        .row
+          .small-12.medium-6.columns
+            label
+              | Summoner Name
+              input(type='text', placeholder='Summoner name...', name='key')
+          .small-12.medium-6.columns
+            label
+              | Region
+              select(name='region')
+                option(value='eune') EUNE
+                option(value='euw') EUW
+                option(value='na') NA
+                option(value='br') BR
+                option(value='jp') JP
+                option(value='kr') KR
+                option(value='lan') LAN
+                option(value='las') LAS
+                option(value='oce') OCE
+                option(value='ru') RU
+                option(value='tr') TR

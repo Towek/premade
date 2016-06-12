@@ -8,12 +8,14 @@ var mongoose = require('mongoose'),
     bunyan = require('bunyan'),
     log = bunyan.createLogger({
       name: 'premade'
-    });
+    }),
+    path = require('path');
     
 // Express config
 app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 port = process.env.PORT || 3000
 

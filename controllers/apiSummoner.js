@@ -3,7 +3,31 @@ var express = require('express'),
     request = require('request'),
     log = require('bunyan').createLogger({name: 'premade'});
 
-router.get('/summoner/:region/:id', function(req, res) {
+router.post('/', function(req, res) {
+  if(!req.body.key || !req.body.region) {
+    res.redirect('/');
+  }
+  var key = req.body.key.toLowerCase().replace(' ', ''),
+      region = req.body.region.toLowerCase();
+
+  request('https://' + region + '.api.pvp.net/api/lol/' + region
+  + '/v1.4/summoner/by-name/' + key + '?api_key=' + process.env.KEY, function(e, r, b) {
+    if(e) {
+      log.error(e);
+    } else {
+      if(r.statusCode == 200) {
+        b = JSON.parse(b)[key];
+        res.redirect('/summoner/' + region + '/' + b.id);
+      } else {
+        log.error(r.statusCode);
+        res.redirect('/');
+      }
+    }
+  });
+});
+
+router.get('/api/summoner/:region/:id', function(req, res) {
+  console.time('all');
   var region = req.params.region,
       id = Number(req.params.id);
   request('https://' + region + '.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/'
@@ -19,7 +43,10 @@ router.get('/summoner/:region/:id', function(req, res) {
           ids.push(game.participants[i].summonerId);
         }
         getMatchlists(ids, region, [], function(e, matchlists) {
-          res.json(matchlists.length);
+          console.timeEnd('all');
+          res.json({
+            participants: game.participants
+          });
         });
       } else {
         log.error(r.statusCode);
@@ -32,7 +59,7 @@ router.get('/summoner/:region/:id', function(req, res) {
 
 function getMatchlists(ids, region, matchlists, cb) {
   request('https://' + region + '.api.pvp.net/api/lol/' + region + '/v2.2/matchlist/by-summoner/'
-  + ids[0] + '?api_key=' + process.env.KEY, function(e, r, b) {
+  + ids[0] + '?beginIndex=0&endIndex=100&api_key=' + process.env.KEY, function(e, r, b) {
     if(e) {
       log.error(e);
     } else {

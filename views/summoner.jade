@@ -1,0 +1,14 @@
+extends layout
+block vars
+  - var title = 'Summoner'
+block body
+  .column.row
+    .summoners
+      .small-12.medium-6.columns#team1
+
+      .small-12.medium-6.columns#team2
+  
+  script.
+    var region = !{JSON.stringify(region)},
+        id = !{JSON.stringify(id)};
+  script(src='/js/summoner.js')
