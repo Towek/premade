@@ -81,7 +81,7 @@ router.get('/api/summoner/:region/:id', function(req, res) {
 function getMatchlist(participant, region, cb) {
   console.time('getMatchlist');
   request('https://' + region + '.api.pvp.net/api/lol/' + region + '/v2.2/matchlist/by-summoner/'
-  + participant.summonerId + '?beginIndex=0&endIndex=200&api_key=' + process.env.KEY, function(e, r, b) {
+  + participant.summonerId + '?beginIndex=0&endIndex=500&api_key=' + process.env.KEY, function(e, r, b) {
     if(e) {
       log.error(e);
       console.timeEnd('getMatchlist');
