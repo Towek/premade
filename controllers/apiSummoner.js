@@ -51,7 +51,7 @@ router.get('/api/summoner/:region/:id', function(req, res) {
       } else {
         log.error(r.statusCode);
         res.status(r.statusCode);
-        res.send('Nope');
+        res.json({success: false});
       }
     }
   });
