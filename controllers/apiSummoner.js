@@ -38,16 +38,31 @@ router.get('/api/summoner/:region/:id', function(req, res) {
     } else {
       if(r.statusCode == 200) {
         var game = JSON.parse(b),
-            ids = [];
+            matchlists = [];
         for(var i = 0, len = game.participants.length; i < len; i++) {
-          ids.push(game.participants[i].summonerId);
-        }
-        getMatchlists(ids, region, [], function(e, matchlists) {
-          console.timeEnd('all');
-          res.json({
-            participants: game.participants
+          getMatchlist(game.participants[i].summonerId, region, function(e, matches) {
+            if(e) {
+              matchlists.push(game.participants[i].summonerId);
+            } else {
+              matchlists.push(matches);
+            }
           });
-        });
+        }
+        var oldLength = 0, matchlistsCheck = setInterval(function() {
+          var matchlistsLen = matchlists.length;
+          if(matchlistsLen > oldLength) {
+            oldLength = matchlistsLen;
+            log.info(matchlistsLen + " matchlists so far.");
+          }
+          if(matchlistsLen == game.participants.length) {
+            clearInterval(matchlistsCheck);
+            console.timeEnd('all');
+            res.json({
+              participants: game.participants,
+              matchlists: matchlists
+            });
+          }
+        }, 100);
       } else {
         log.error(r.statusCode);
         res.status(r.statusCode);
@@ -57,23 +72,20 @@ router.get('/api/summoner/:region/:id', function(req, res) {
   });
 });
 
-function getMatchlists(ids, region, matchlists, cb) {
+function getMatchlist(id, region, cb) {
   request('https://' + region + '.api.pvp.net/api/lol/' + region + '/v2.2/matchlist/by-summoner/'
-  + ids[0] + '?beginIndex=0&endIndex=100&api_key=' + process.env.KEY, function(e, r, b) {
+  + id + '?beginIndex=0&endIndex=100&api_key=' + process.env.KEY, function(e, r, b) {
     if(e) {
       log.error(e);
     } else {
       if(r.statusCode == 200) {
         b = JSON.parse(b);
-        matchlists.push(b.matches);
-        ids.shift();
-        if(ids.length) {
-          getMatchlists(ids, region, matchlists, cb);
-        } else {
-          cb(null, matchlists);
-        }
+        cb(null, b.matches);
+      } else if (r.statusCode == 429) {;
+        setTimeout(getMatchlist(id, region, cb), r.headers.retry_after * 1000);
       } else {
         log.error(r.statusCode);
+        cb(r.statusCode);
       }
     }
   });
