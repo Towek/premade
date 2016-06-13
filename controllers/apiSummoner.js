@@ -44,7 +44,10 @@ router.get('/api/summoner/:region/:id', function(req, res) {
             if(e) {
               matchlists.push(game.participants[i].summonerId);
             } else {
-              matchlists.push(matches);
+              matchlists.push({
+                summoner: game.participants[i],
+                matches: matches
+              });
             }
           });
         }
@@ -57,10 +60,8 @@ router.get('/api/summoner/:region/:id', function(req, res) {
           if(matchlistsLen == game.participants.length) {
             clearInterval(matchlistsCheck);
             console.timeEnd('all');
-            res.json({
-              participants: game.participants,
-              matchlists: matchlists
-            });
+            res.json(matchlists);
+            //computeMatchlists(matchlists);
           }
         }, 100);
       } else {
@@ -90,6 +91,19 @@ function getMatchlist(id, region, cb) {
     }
   });
 }
+
+/*function computeMatchlists(matchlists, cb) {
+  var matches = {};
+  for(var i = 0, leni = matchlists.length; i < leni; i++) {
+    var summoner = matchlists[i];
+    for(var j = 0, lenj = summoner.matches.length; j < lenj; j++) {
+      var match = matchlist[j];
+      if(matches[match.matchId]) {
+        matches[match.matchId] ;
+      }
+    }
+  }
+}*/
 
 function toPlatform(region) {
   return {
