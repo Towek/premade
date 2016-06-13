@@ -1,16 +1,18 @@
 extends layout
 block vars
-  - var title = 'Home';
+  - var title = 'Home'
 block body
-  .row
+  .row.form
+    .small-12.columns
+      h3 Let's check if someone in your game is premade, shall we?
     .small-12.columns
       form(method='post')
         .row
-          .small-12.medium-6.columns
+          .small-12.medium-4.medium-offset-3.columns
             label
               | Summoner Name
               input(type='text', placeholder='Summoner name...', name='key')
-          .small-12.medium-6.columns
+          .small-12.medium-2.columns
             label
               | Region
               select(name='region')
@@ -25,3 +27,5 @@ block body
                 option(value='oce') OCE
                 option(value='ru') RU
                 option(value='tr') TR
+          .small-12.columns.search
+            button.success.button(type="submit") Search

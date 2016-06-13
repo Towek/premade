@@ -14,8 +14,6 @@ $(document).ready(function() {
           team2.push(r.participants[i]);
         }
       }
-      $('#team1').text(team1);
-      $('#team2').text(team2);
     }
   });
 });
